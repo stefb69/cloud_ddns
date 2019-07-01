@@ -1,6 +1,6 @@
 zone "{revzone}" IN {{
         type master;
-        file "{revzone_file}";
-        journal "{journal_file}";
+        file "/etc/bind/{revzone_file}";
+        journal "/var/lib/bind/{revzone_file}.jnl";
         allow-update {{ key "{key_name}"; }};
 }};
