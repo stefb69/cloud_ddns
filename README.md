@@ -103,6 +103,5 @@ Use ping and dig or nslookup to test the DNS server
 PART 2 - HOW TO CONNECT INSTANCES
 ---------------------------------
 
-An instance needs to be configured to resolve using the new DNS. The easiest way to do this is to configure the image(s). In the image, change /etc/resolv.conf and /etc/sysconfig/network-scripts/ifcfg-eth0 as described below. These changes can also be done for an individual instance. 
-
+An instance needs to be configured to resolve using the new DNS.
 Use cloud-config or configure the neutron dhcp server to provide with the right parameters.
