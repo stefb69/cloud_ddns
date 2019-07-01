@@ -7,11 +7,12 @@ import netaddr
 from netaddr import all_matching_cidrs
 
 def get_nova_creds():
-    d = {}
+    d = {}  
     d['username'] = os.environ['OS_USERNAME']
-    d['api_key'] = os.environ['OS_PASSWORD']
+    d['password'] = os.environ['OS_PASSWORD']
     d['auth_url'] = os.environ['OS_AUTH_URL']
-    d['project_id'] = os.environ['OS_TENANT_NAME']
+    d['tenant_id'] = os.environ['OS_TENANT_ID']
+    d['tenant_name'] = os.environ['OS_TENANT_NAME']
     return d
 
 class parms():

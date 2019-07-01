@@ -1,6 +1,6 @@
 $TTL 86400
 @   IN  SOA   {dns_shortname}.{domain_name} root.{domain_name}. (
-        2014110701  ;Serial
+        2018110701  ;Serial
         7200        ;Refresh
         1800        ;Retry
         604800      ;Expire

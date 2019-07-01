@@ -8,7 +8,9 @@ try:
 except:
     import pickle
 from netaddr import all_matching_cidrs
-import novaclient.v1_1.client as novaclient
+from keystoneauth1.identity import v2
+from keystoneauth1 import session
+from novaclient  import client as novaclient
 from ddns_common import get_nova_creds
 from ddns_common import valid_hostname
 from ddns_common import reverse_dns_zone
@@ -43,8 +45,12 @@ def get_reverse_net_dns(ip, ip_ranges):
     if len(rev_cidr) > 1:
         print "ERROR: overlapping CIDRs"
         sys.exit()
-    rev_net = str(rev_cidr[0])
+    
     rev_dns = netaddr.IPAddress(ip).reverse_dns
+    if len(rev_cidr) == 0:
+        return "", rev_dns
+
+    rev_net = str(rev_cidr[0])
     return rev_net, rev_dns
 
 def main():
@@ -55,8 +61,12 @@ def main():
         print 'Please set OpenStack credentials, e.g. type source openrc.sh, and try again'
         sys.exit()
 
+
+    auth = v2.Password(**creds)
+    sess = session.Session(auth=auth)
+
     # Retrieve the Nova client
-    nova = novaclient.Client(**creds)
+    nova = novaclient.Client(2, session=sess, region_name=os.environ['OS_REGION_NAME'])
 
     # get template/dictionary variables
     mappings = parms('ddns_config.yaml')
@@ -83,8 +93,8 @@ def main():
 
     # create a current list of servers and IPs that are valid for DNS updates
     curr_servers = {}
-    for server in nova.servers.list(search_opts={'all_tenants': 1}):
-
+    for server in nova.servers.list():
+        print "Got -> Server name %s " % server.name
         if server.status != 'ACTIVE':
             print "INFO: Server name %s has state %s" % (server.name, server.status)
         elif not valid_hostname(server.name):
@@ -93,6 +103,9 @@ def main():
             print "WARNING: Server %s/%s is a duplicate of Server %s/%s" % (server.name, server.networks.values()[0], server.name, prev_servers[server.name][0])
         elif server.name in curr_servers.keys():   # keys refers to the server names
             print "WARNING: Server %s/%s is a duplicate of Server %s/%s" % (server.name, server.networks.values(), server.name, curr_servers[server.name][0])
+        elif server.name == "pf0.datalab.lan":
+            print "INFO: Skipping server %s with state %s" % (server.name, server.status)
+            next
         else:
             curr_servers[server.name] = server.networks.values()
 
@@ -113,8 +126,9 @@ def main():
             # update reverse zone content
             for ip in ip_addresses[0]:
                 rev_net, rev_dns = get_reverse_net_dns(ip, mappings.value('ip_ranges'))
-                content_PTR[rev_net].append(
-                    "update delete " + rev_dns + " 600 IN PTR " + server_name + ".\n")
+                if rev_net != "":
+                    content_PTR[rev_net].append(
+                        "update delete " + rev_dns + " 600 IN PTR " + server_name + ".\n")
 
     # Add new servers, e.g. those in the current list but not the previous one
     for server_name in curr_servers:
@@ -133,9 +147,11 @@ def main():
  
             # update reverse zone content
             for ip in ip_addresses[0]:
+
                 rev_net, rev_dns = get_reverse_net_dns(ip, mappings.value('ip_ranges'))
-                content_PTR[rev_net].append(
-                    "update add " + rev_dns + " 600 IN PTR " + server_name + ".\n")
+                if rev_net != "":
+                    content_PTR[rev_net].append(
+                        "update add " + rev_dns + " 600 IN PTR " + server_name + ".\n")
 
     # write content
     content_A_rec.write('A_records')

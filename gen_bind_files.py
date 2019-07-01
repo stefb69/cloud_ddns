@@ -43,7 +43,8 @@ def main():
     mappings.add('secret_key', get_ddns_key())
 
     # initialize content
-    named = content('templates/template.named.conf')
+    named = content('templates/template.named.conf.local')
+    options = content('templates/template.named.conf.options')
     forward_zone = content('templates/template.forward.cloudzone')
     reverse_zone = {}
     for net in mappings.value('ip_ranges'):
@@ -70,6 +71,7 @@ def main():
 
     # swap replacement fields with mapped content and add reverse lookup for the DNS instance IPs
     named.replace_fields(mappings)
+    options.replace_fields(mappings)
     forward_zone.replace_fields(mappings)
     for net in mappings.value('ip_ranges'):
         reverse_zone[net].replace_fields(mappings)
@@ -83,7 +85,8 @@ def main():
     resolvconf.replace_fields(mappings)
 
     # write content
-    named.write('gen4bind/named.conf')
+    named.write('gen4bind/named.conf.local')
+    options.write('gen4bind/named.conf.options')
     forward_zone.write('gen4bind/forward.cloudzone')
     for net in mappings.value('ip_ranges'):
         filename = "gen4bind/%s" % revzone_filename(net)

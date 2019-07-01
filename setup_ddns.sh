@@ -18,18 +18,18 @@ python gen_ddns_sh.py
 chmod +x ddns.sh
 #
 # copy generated files to the right directories
-cp /etc/named.conf /etc/named.conf.ori
-mv gen4bind/named.conf /etc/named.conf
+cp /etc/bind/named.conf.local /etc/bind/named.conf.local.ori
+mv gen4bind/named.conf /etc/bind/named.conf.local
 mv gen4bind/forward.cloudzone /var/named
 mv gen4bind/reverse.cloudzone.* /var/named
-cp /etc/resolv.conf /etc/resolv.conf.ori
-mv gen4bind/resolv.conf /etc/resolv.conf
+#cp /etc/resolv.conf /etc/resolv.conf.ori
+#mv gen4bind/resolv.conf /etc/resolv.conf
 #
 # change permissions on /var/named
 chmod -R 775 /var/named
 #
 # restart DNS
-service named restart
+systemctl restart bind9
 #
 # edit ifcfg-eth0 to prevent resolv.conf from being overwritten
-echo "PEERDNS=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+#echo "PEERDNS=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
