@@ -1,0 +1,5 @@
+cloud_ddns.sublime-*
+Kcloud.ddns.*
+ddns_config.yaml
+ddns.sh
+gen4bind/

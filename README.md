@@ -27,9 +27,9 @@ This solution includes the following:
 PRE-REQUISITES
 --------------
 
-1.  Deploy a Centos/RHEL 6.5 instance for the DNS. It should be sufficient to choose a smaller flavor like “n1.small”.
+1.  Deploy a Ubuntu 18.04 instance for the DNS. It should be sufficient to choose a smaller flavor like “n1.small”.
 
-2.  Add a Floating IP
+2.  Add a Floating IP (optional)
 
 3.  Setup security group rules for the DNS instance. The following ports should be open: TCP 22 (SSH), TCP 53 and UDP 53 (for DNS).
 
@@ -41,19 +41,20 @@ PRE-REQUISITES
 PART 1 - HOW TO INSTALL
 -----------------------
 
-### 1. Install BIND
+### 1. Install BIND and Openstack client and dependencies
 
 Install the bind and bind-utils packages if they have not already been installed. Note that bind sets up the DNS server and bind-utils has the nsupdate tools.
 
-    [centos@ddns ~]$ sudo yum update -y
-    [centos@ddns ~]$ sudo yum install -y bind bind-utils
+    ubuntu@ddns:~$ sudo apt update && sudo apt -y upgrade
+    ubuntu@ddns:~$ sudo apt install python-openstackclient python-yaml python-netaddr
+    ubuntu@ddns:~$ sudo apt install -y bind9
 
 ### 2. Get the Cloud Admin’s OpenStack API Credentials, e.g. openrc.sh
 
 Using the Admin’s credentials will allow the “DDNS “ scripts to see instances across projects. If openrc.sh prompts for a password, remove the prompt and add the password in the file. Including the password in the file will be required for the scripts to run automatically. Below is an example of how to test the openrc.sh file using the OpenStack CLI.
 
-    [centos@ddns ~]$ source openrc.sh 
-    [centos@ddns ~]$ nova list
+    ubuntu@ddns:~$ source openrc.sh 
+    ubuntu@ddns:~$ nova list
 
 ### 3. Unzip the DDNS scripts
 
@@ -104,15 +105,4 @@ PART 2 - HOW TO CONNECT INSTANCES
 
 An instance needs to be configured to resolve using the new DNS. The easiest way to do this is to configure the image(s). In the image, change /etc/resolv.conf and /etc/sysconfig/network-scripts/ifcfg-eth0 as described below. These changes can also be done for an individual instance. 
 
-### 1. Edit /etc/resolv.conf
-
-First, change the contents of resolv.conf as follows. The “nameserver_ip” can be either the fixed or floating IP of the DNS instance.
-
-    search <domain_name>
-    nameserver <nameserver_ip>
-
-### 2. Add PEERDNS=”no” to /etc/sysconfig/network-scripts/ifcfg-eth0.
-
-For example, type:
-
-    echo "PEERDNS=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+Use cloud-config or configure the neutron dhcp server to provide with the right parameters.
