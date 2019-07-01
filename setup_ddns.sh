@@ -19,14 +19,18 @@ chmod +x ddns.sh
 #
 # copy generated files to the right directories
 cp /etc/bind/named.conf.local /etc/bind/named.conf.local.ori
-mv gen4bind/named.conf /etc/bind/named.conf.local
-mv gen4bind/forward.cloudzone /var/named
-mv gen4bind/reverse.cloudzone.* /var/named
+mv gen4bind/named.*.conf /etc/bind/
+mv gen4bind/forward.cloudzone /var/lib/bind/
+mv gen4bind/reverse.cloudzone.* /var/lib/bind/
 #cp /etc/resolv.conf /etc/resolv.conf.ori
 #mv gen4bind/resolv.conf /etc/resolv.conf
 #
-# change permissions on /var/named
-chmod -R 775 /var/named
+# check presence of /var/lib/bind/
+if [ ! -d "/var/lib/bind" ]; then
+  mkdir /var/lib/bind
+  chown -R bind:bind /var/lib/bind
+  chmod -R 775 /var/lib/bind
+fi
 #
 # restart DNS
 systemctl restart bind9

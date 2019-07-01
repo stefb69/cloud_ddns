@@ -9,7 +9,7 @@ key "{key_name}" {{
 
 zone "{domain_name}" IN {{
         type master;
-        file "/etc/bind/forward.cloudzone";
+        file "/var/lib/bind/forward.cloudzone";
         journal "/var/lib/bind/forward.cloudzone.jnl";
         allow-update {{ key "{key_name}"; }};
 }};
