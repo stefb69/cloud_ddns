@@ -60,11 +60,11 @@ Using the Admin’s credentials will allow the “DDNS “ scripts to see instan
 
 For example,
 
-    [centos@ddns ~]$ unzip /tmp/ddns.zip
+    ubuntu@ddns:~$ unzip /tmp/ddns.zip
 
 ### 4. Setup ddns_config.yaml
 
-The “ddns_config.yaml” file has all of the configuration parameters that will be used to configure BIND and the “DDNS” scripts. Edit this file and input customized information. Then save the file.  It is important to make sure there are no errors, like no overlapping IP ranges in this file. Note that all fields can take only one value with the exception of “forwarders” and “ip_ranges”. Multiple forwarders and IP address ranges can be included. The IP address ranges are for both the fixed and floating OpenStack networks. These scripts require that the ranges be on octet boundaries, e.g. /24, /16 or /8.
+The “ddns_config_sample.yaml” file has all of the configuration parameters that will be used to configure BIND and the “DDNS” scripts. Copy this file to “ddns_config.yaml” and input customized information. Then save the file.  It is important to make sure there are no errors, like no overlapping IP ranges in this file. Note that all fields can take only one value with the exception of “forwarders” and “ip_ranges”. Multiple forwarders and IP address ranges can be included. The IP address ranges are for both the fixed and floating OpenStack networks. These scripts require that the ranges be on octet boundaries, e.g. /24, /16 or /8.
 Here is an already filled in sample of the required fields.
 
     domain_name: cloud.myuniverse.org
@@ -80,19 +80,19 @@ Here is an already filled in sample of the required fields.
 
 setup_ddns.sh creates configuration files for the DNS updates as well as configuration files for BIND. It then moves the BIND files to the appropriate directories and restarts the DNS (“named”) service.  Feel free to view the script to see what it does. Run this script using “sudo”. 
 
-    [centos@ddns ~]$ sudo ./setup_ddns.sh
+    ubuntu@ddns:~$ sudo ./setup_ddns.sh
 
 ### 6. Run ddns.sh to complete the setup of the Dynamic DNS
 
 Now the main executable script, ddns.sh, has been created. It will use the OpenStack APIs to query instances and then update the DNS appropriately. Run the script.
 
-    [centos@ddns ~]$ ./ddns.sh
+    ubuntu@ddns:~$ ./ddns.sh
 
 ### 7. Add ddns.sh to cron to update the DNS automatically
 
 The following example shows how to setup cron to call ddns.sh every minute.
 
-    [centos@ddns ~]$ crontab –e  
+    ubuntu@ddns:~$ crontab –e  
 
 Once in the file, add  “ * * * * * <path-to-script>”. To monitor if the cron is working monitor /var/log/messages with “tail –f /var/log/messages”.
 
