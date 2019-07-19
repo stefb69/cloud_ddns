@@ -54,7 +54,7 @@ Install the bind and bind-utils packages if they have not already been installed
 Using the Admin’s credentials will allow the “DDNS “ scripts to see instances across projects. If openrc.sh prompts for a password, remove the prompt and add the password in the file. Including the password in the file will be required for the scripts to run automatically. Below is an example of how to test the openrc.sh file using the OpenStack CLI.
 
     ubuntu@ddns:~$ source openrc.sh 
-    ubuntu@ddns:~$ nova list
+    ubuntu@ddns:~$ openstack server list
 
 ### 3. Unzip the DDNS scripts
 
